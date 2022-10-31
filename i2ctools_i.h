@@ -10,6 +10,7 @@
 #include "views/sniffer_view.h"
 #include "views/scanner_view.h"
 #include "views/sender_view.h"
+#include "views/save_view.h"
 
 // App datas
 typedef struct {
@@ -19,4 +20,6 @@ typedef struct {
     i2cScanner* scanner;
     i2cSniffer* sniffer;
     i2cSender* sender;
+
+    i2cToolsSaver* save;
 } i2cTools;

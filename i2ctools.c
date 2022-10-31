@@ -67,6 +67,10 @@ int32_t i2ctools_app(void* p) {
     // Share scanner with sender
     i2ctools->sender->scanner = i2ctools->scanner;
 
+    // Saver
+    i2ctools->save = i2c_saver_alloc();
+    i2ctools->save->i2c_data = i2ctools->sniffer;
+
     while(furi_message_queue_get(event_queue, &event, FuriWaitForever) == FuriStatusOk) {
         if(event.key == InputKeyBack && event.type == InputTypeRelease) {
             if(i2ctools->main_view->current_view == MAIN_VIEW) {
@@ -93,7 +97,9 @@ int32_t i2ctools_app(void* p) {
                     i2ctools->sender->value++;
                     i2ctools->sender->sended = false;
                 }
-            }
+            } else if(i2ctools->main_view->current_view == SNIFF_VIEW) {
+                i2csniffer_save_name_on_enter(i2ctools->save);
+                        }
         } else if(
             event.key == InputKeyUp &&
             (event.type == InputTypeLong || event.type == InputTypeRepeat)) {
