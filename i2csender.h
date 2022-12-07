@@ -4,13 +4,19 @@
 #include <furi_hal.h>
 #include "i2cscanner.h"
 
+#define MAX_DATA_TO_SEND 10
+
 typedef struct {
     uint8_t address_idx;
-    uint8_t value;
-    uint8_t recv[2];
+    uint8_t value[MAX_DATA_TO_SEND];
+    uint8_t tosend_size;
+    uint8_t recv[5];
     bool must_send;
     bool sended;
     bool error;
+    uint8_t menu_index;
+    uint8_t current_frame;
+    bool write;
 
     i2cScanner* scanner;
 } i2cSender;

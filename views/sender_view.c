@@ -22,8 +22,6 @@ void draw_sender_view(Canvas* canvas, i2cSender* i2c_sender) {
     // Addr
     canvas_set_color(canvas, ColorBlack);
     canvas_draw_str_aligned(canvas, 3, 5, AlignLeft, AlignTop, "Addr: ");
-    canvas_draw_icon(canvas, 33, 5, &I_ButtonLeft_4x7);
-    canvas_draw_icon(canvas, 68, 5, &I_ButtonRight_4x7);
     char addr_text[8];
     snprintf(
         addr_text,
@@ -31,12 +29,42 @@ void draw_sender_view(Canvas* canvas, i2cSender* i2c_sender) {
         "0x%02x",
         (int)i2c_sender->scanner->addresses[i2c_sender->address_idx]);
     canvas_draw_str_aligned(canvas, 43, 5, AlignLeft, AlignTop, addr_text);
+    if(i2c_sender->menu_index == 0) {
+        canvas_draw_icon(canvas, 33, 7, &I_ButtonUp_7x4);
+        canvas_draw_icon(canvas, 68, 7, &I_ButtonDown_7x4);
+    }
+    // Read/Write
+    if(i2c_sender->write) {
+        canvas_draw_str_aligned(canvas, 78, 5, AlignLeft, AlignTop, "W");
+    } else {
+        canvas_draw_str_aligned(canvas, 78, 5, AlignLeft, AlignTop, "R");
+    }
+    if(i2c_sender->menu_index == 1) {
+        canvas_draw_icon(canvas, 68, 5, &I_ButtonUp_7x4);
+        canvas_draw_icon(canvas, 89, 5, &I_ButtonDown_7x4);
+    }
+
     // Value
     canvas_draw_str_aligned(canvas, 3, 15, AlignLeft, AlignTop, "Value: ");
-    canvas_draw_icon(canvas, 33, 17, &I_ButtonUp_7x4);
-    canvas_draw_icon(canvas, 68, 17, &I_ButtonDown_7x4);
-    snprintf(addr_text, sizeof(addr_text), "0x%02x", (int)i2c_sender->value);
+    snprintf(
+        addr_text, sizeof(addr_text), "0x%02x", (int)i2c_sender->value[i2c_sender->current_frame]);
     canvas_draw_str_aligned(canvas, 43, 15, AlignLeft, AlignTop, addr_text);
+    // Frame Index
+    snprintf(
+        addr_text,
+        sizeof(addr_text),
+        "%d/%d",
+        (int)i2c_sender->current_frame + 1,
+        (int)i2c_sender->tosend_size);
+    canvas_draw_str_aligned(canvas, 78, 15, AlignLeft, AlignTop, addr_text);
+    if(i2c_sender->menu_index == 2) {
+        canvas_draw_icon(canvas, 33, 17, &I_ButtonUp_7x4);
+        canvas_draw_icon(canvas, 68, 17, &I_ButtonDown_7x4);
+    } else if(i2c_sender->menu_index == 3) {
+        canvas_draw_icon(canvas, 68, 17, &I_ButtonUp_7x4);
+        canvas_draw_icon(canvas, 107, 17, &I_ButtonDown_7x4);
+    }
+
     if(i2c_sender->must_send) {
         i2c_send(i2c_sender);
     }
