@@ -15,7 +15,7 @@ void draw_scanner_view(Canvas* canvas, i2cScanner* i2c_scanner) {
     uint8_t idx_to_print = 0;
     for(uint8_t i = 0; i < (int)i2c_scanner->nb_found; i++) {
         idx_to_print = i + i2c_scanner->menu_index * 3;
-        if(idx_to_print >= MAX_I2C_ADDR) {
+        if(idx_to_print >= MAX_I2C_ADDR || idx_to_print >= (int)i2c_scanner->nb_found) {
             break;
         }
         snprintf(

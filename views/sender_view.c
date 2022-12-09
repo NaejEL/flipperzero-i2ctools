@@ -70,17 +70,21 @@ void draw_sender_view(Canvas* canvas, i2cSender* i2c_sender) {
     }
     // Result
     canvas_draw_str_aligned(canvas, 3, 25, AlignLeft, AlignTop, "Result: ");
+    if(i2c_sender->error) {
+        canvas_draw_str_aligned(canvas, 35, 25, AlignLeft, AlignTop, "Error");
+        return;
+    }
     if(i2c_sender->sended) {
         uint8_t row = 1;
         uint8_t column = 1;
-        const uint8_t x_min = 3;
+        const uint8_t x_min = 8;
         const uint8_t y_min = 25;
         uint8_t x_pos = 0;
         uint8_t y_pos = 0;
         for(uint8_t i = 0; i < sizeof(i2c_sender->recv); i++) {
             x_pos = x_min + (column - 1) * 35;
             if(row == 1) {
-                x_pos += 40;
+                x_pos += 35;
             }
             y_pos = y_min + (row - 1) * 10;
             snprintf(addr_text, sizeof(addr_text), "0x%02x", (int)i2c_sender->recv[i]);

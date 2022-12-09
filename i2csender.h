@@ -3,6 +3,7 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include "i2cscanner.h"
+//#include "views/sender_view.h"
 
 #define MAX_DATA_TO_SEND 10
 
@@ -19,6 +20,7 @@ typedef struct {
     bool write;
 
     i2cScanner* scanner;
+    //senderView menu;
 } i2cSender;
 
 void i2c_send();
