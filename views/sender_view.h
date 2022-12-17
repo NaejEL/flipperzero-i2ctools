@@ -6,10 +6,4 @@
 
 #define SEND_TEXT "SEND"
 
-/*
-typedef struct {
-    uint8_t currrent_index;
-    bool write;
-} senderView;
-*/
 void draw_sender_view(Canvas* canvas, i2cSender* i2c_sender);

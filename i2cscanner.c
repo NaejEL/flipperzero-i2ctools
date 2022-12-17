@@ -17,8 +17,8 @@ void scan_i2c_bus(i2cScanner* i2c_scanner) {
             i2c_scanner->addresses[i2c_scanner->nb_found] = addr >> 1;
             i2c_scanner->nb_found++;
         }
-        //i2c_scanner->addresses[i2c_scanner->nb_found] = addr >> 1;
-        //i2c_scanner->nb_found++;
+        i2c_scanner->addresses[i2c_scanner->nb_found] = addr >> 1;
+        i2c_scanner->nb_found++;
     }
     furi_hal_i2c_release(I2C_BUS);
 }
