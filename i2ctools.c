@@ -66,7 +66,7 @@ int32_t i2ctools_app(void* p) {
     i2ctools->sender = i2c_sender_alloc();
     // Share scanner and sniffer with sender
     i2ctools->sender->scanner = i2ctools->scanner;
-    //i2ctools->sender->sniffer = i2ctools->sniffer;
+    i2ctools->sender->sniffer = i2ctools->sniffer;
 
     while(furi_message_queue_get(event_queue, &event, FuriWaitForever) == FuriStatusOk) {
         // Back

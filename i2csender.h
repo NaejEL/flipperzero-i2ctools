@@ -3,8 +3,9 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include "i2cscanner.h"
+#include "i2csniffer.h"
 
-#define MAX_DATA_TO_SEND 10
+#define MAX_DATA_TO_SEND 255
 
 typedef struct {
     uint8_t address_idx;
@@ -19,6 +20,7 @@ typedef struct {
     bool write;
 
     i2cScanner* scanner;
+    i2cSniffer* sniffer;
 } i2cSender;
 
 void i2c_send(i2cSender* i2c_sender);

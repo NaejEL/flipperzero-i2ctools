@@ -5,6 +5,7 @@ void i2c_send(i2cSender* i2c_sender) {
     if(!i2c_sender->write) {
         adress &= 0x01;
     }
+    start_interrupts(i2c_sender->sniffer);
     furi_hal_i2c_acquire(I2C_BUS);
     i2c_sender->error = furi_hal_i2c_trx(
         I2C_BUS,
@@ -17,6 +18,7 @@ void i2c_send(i2cSender* i2c_sender) {
     furi_hal_i2c_release(I2C_BUS);
     i2c_sender->must_send = false;
     i2c_sender->sended = true;
+    stop_interrupts(i2c_sender->sniffer);
 }
 
 i2cSender* i2c_sender_alloc() {
