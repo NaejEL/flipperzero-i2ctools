@@ -70,11 +70,12 @@ void draw_sender_view(Canvas* canvas, i2cSender* i2c_sender) {
     }
     // Result
     canvas_draw_str_aligned(canvas, 3, 25, AlignLeft, AlignTop, "Result: ");
-    if(i2c_sender->error) {
-        canvas_draw_str_aligned(canvas, 35, 25, AlignLeft, AlignTop, "Error");
-        return;
-    }
     if(i2c_sender->sended) {
+        if(i2c_sender->error) {
+            canvas_draw_str_aligned(canvas, 102, 25, AlignLeft, AlignTop, "NACK");
+        } else {
+            canvas_draw_str_aligned(canvas, 102, 25, AlignLeft, AlignTop, "ACK");
+        }
         uint8_t row = 1;
         uint8_t column = 1;
         const uint8_t x_min = 8;
