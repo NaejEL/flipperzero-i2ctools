@@ -20,7 +20,6 @@ typedef struct {
     bool write;
 
     i2cScanner* scanner;
-    //senderView menu;
 } i2cSender;
 
 void i2c_send();
