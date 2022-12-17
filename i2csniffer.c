@@ -17,6 +17,8 @@ void clear_sniffer_buffers(i2cSniffer* i2c_sniffer) {
 
 void start_interrupts(i2cSniffer* i2c_sniffer) {
     furi_assert(i2c_sniffer);
+    i2c_sniffer->started = true;
+    i2c_sniffer->state = I2C_BUS_FREE;
     furi_hal_gpio_init(pinSCL, GpioModeInterruptRise, GpioPullNo, GpioSpeedHigh);
     furi_hal_gpio_add_int_callback(pinSCL, SCLcallback, i2c_sniffer);
 
@@ -25,7 +27,10 @@ void start_interrupts(i2cSniffer* i2c_sniffer) {
     furi_hal_gpio_add_int_callback(pinSDA, SDAcallback, i2c_sniffer);
 }
 
-void stop_interrupts() {
+void stop_interrupts(i2cSniffer* i2c_sniffer) {
+    furi_assert(i2c_sniffer);
+    i2c_sniffer->started = false;
+    i2c_sniffer->state = I2C_BUS_FREE;
     furi_hal_gpio_remove_int_callback(pinSCL);
     furi_hal_gpio_remove_int_callback(pinSDA);
     // Reset GPIO pins to default state
@@ -95,7 +100,7 @@ i2cSniffer* i2c_sniffer_alloc() {
 void i2c_sniffer_free(i2cSniffer* i2c_sniffer) {
     furi_assert(i2c_sniffer);
     if(i2c_sniffer->started) {
-        stop_interrupts();
+        stop_interrupts(i2c_sniffer);
     }
     free(i2c_sniffer);
 }

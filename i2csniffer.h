@@ -38,7 +38,7 @@ typedef struct {
 
 void clear_sniffer_buffers(i2cSniffer* i2c_sniffer);
 void start_interrupts(i2cSniffer* i2c_sniffer);
-void stop_interrupts();
+void stop_interrupts(i2cSniffer* i2c_sniffer);
 void SDAcallback(void* _i2c_sniffer);
 void SCLcallback(void* _i2c_sniffer);
 

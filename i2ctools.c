@@ -64,8 +64,9 @@ int32_t i2ctools_app(void* p) {
     i2ctools->scanner = i2c_scanner_alloc();
 
     i2ctools->sender = i2c_sender_alloc();
-    // Share scanner with sender
+    // Share scanner and sniffer with sender
     i2ctools->sender->scanner = i2ctools->scanner;
+    //i2ctools->sender->sniffer = i2ctools->sniffer;
 
     while(furi_message_queue_get(event_queue, &event, FuriWaitForever) == FuriStatusOk) {
         // Back
@@ -74,9 +75,7 @@ int32_t i2ctools_app(void* p) {
                 break;
             } else {
                 if(i2ctools->main_view->current_view == SNIFF_VIEW) {
-                    stop_interrupts();
-                    i2ctools->sniffer->started = false;
-                    i2ctools->sniffer->state = I2C_BUS_FREE;
+                    stop_interrupts(i2ctools->sniffer);
                 }
                 i2ctools->main_view->current_view = MAIN_VIEW;
             }
@@ -214,7 +213,9 @@ int32_t i2ctools_app(void* p) {
                 }
             }
 
-        } else if(event.key == InputKeyOk && event.type == InputTypeRelease) {
+        }
+        // Ok
+        else if(event.key == InputKeyOk && event.type == InputTypeRelease) {
             if(i2ctools->main_view->current_view == MAIN_VIEW) {
                 i2ctools->main_view->current_view = i2ctools->main_view->menu_index;
             } else if(i2ctools->main_view->current_view == SCAN_VIEW) {
@@ -223,13 +224,9 @@ int32_t i2ctools_app(void* p) {
                 i2ctools->sender->must_send = true;
             } else if(i2ctools->main_view->current_view == SNIFF_VIEW) {
                 if(i2ctools->sniffer->started) {
-                    stop_interrupts();
-                    i2ctools->sniffer->started = false;
-                    i2ctools->sniffer->state = I2C_BUS_FREE;
+                    stop_interrupts(i2ctools->sniffer);
                 } else {
                     start_interrupts(i2ctools->sniffer);
-                    i2ctools->sniffer->started = true;
-                    i2ctools->sniffer->state = I2C_BUS_FREE;
                 }
             }
         }
