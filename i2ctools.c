@@ -1,5 +1,7 @@
 #include "i2ctools_i.h"
 
+#include <dialogs/dialogs.h>
+
 void i2ctools_draw_callback(Canvas* canvas, void* ctx) {
     i2cTools* i2ctools = ctx;
     if(furi_mutex_acquire(i2ctools->mutex, 200) != FuriStatusOk) {
@@ -77,6 +79,7 @@ int32_t i2ctools_app(void* p) {
             } else {
                 if(i2ctools->main_view->current_view == SNIFF_VIEW) {
                     stop_interrupts();
+                    i2c_sniffer_stop_logging(i2ctools->sniffer);
                     i2ctools->sniffer->started = false;
                     i2ctools->sniffer->state = I2C_BUS_FREE;
                 }
@@ -176,9 +179,16 @@ int32_t i2ctools_app(void* p) {
             } else if(i2ctools->main_view->current_view == SNIFF_VIEW) {
                 if(i2ctools->sniffer->started) {
                     stop_interrupts();
+                    i2c_sniffer_stop_logging(i2ctools->sniffer);
                     i2ctools->sniffer->started = false;
                     i2ctools->sniffer->state = I2C_BUS_FREE;
                 } else {
+                    if(!i2c_sniffer_start_logging(i2ctools->sniffer)) {
+                        DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
+                        dialogs_app_toast_show(dialogs, "Storage unavailable", 2000);
+                        furi_record_close(RECORD_DIALOGS);
+                    }
+                    clear_sniffer_buffers(i2ctools->sniffer);
                     start_interrupts(i2ctools->sniffer);
                     i2ctools->sniffer->started = true;
                     i2ctools->sniffer->state = I2C_BUS_FREE;
@@ -210,6 +220,17 @@ int32_t i2ctools_app(void* p) {
             }
         }
         view_port_update(i2ctools->view_port);
+        if(i2ctools->sniffer->log_error_pending) {
+            DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
+            const char* toast_message =
+                i2ctools->sniffer->log_error_message[0] != '\0'
+                    ? i2ctools->sniffer->log_error_message
+                    : "Log write failed";
+            dialogs_app_toast_show(dialogs, toast_message, 2000);
+            furi_record_close(RECORD_DIALOGS);
+            i2ctools->sniffer->log_error_pending = false;
+            i2ctools->sniffer->log_error_message[0] = '\0';
+        }
     }
     gui_remove_view_port(gui, i2ctools->view_port);
     view_port_free(i2ctools->view_port);
