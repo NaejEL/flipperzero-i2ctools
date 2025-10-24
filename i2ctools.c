@@ -2,6 +2,17 @@
 
 #include <dialogs/dialogs.h>
 
+static void i2ctools_show_dialog_message(const char* text) {
+    DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
+    DialogMessage* message = dialog_message_alloc();
+    dialog_message_set_header(message, "I2C Tools", 64, 4, AlignCenter, AlignTop);
+    dialog_message_set_text(message, text, 64, 32, AlignCenter, AlignCenter);
+    dialog_message_set_buttons(message, NULL, "OK", NULL);
+    dialog_message_show(dialogs, message);
+    dialog_message_free(message);
+    furi_record_close(RECORD_DIALOGS);
+}
+
 void i2ctools_draw_callback(Canvas* canvas, void* ctx) {
     i2cTools* i2ctools = ctx;
     if(furi_mutex_acquire(i2ctools->mutex, 200) != FuriStatusOk) {
@@ -184,9 +195,7 @@ int32_t i2ctools_app(void* p) {
                     i2ctools->sniffer->state = I2C_BUS_FREE;
                 } else {
                     if(!i2c_sniffer_start_logging(i2ctools->sniffer)) {
-                        DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
-                        dialogs_app_toast_show(dialogs, "Storage unavailable", 2000);
-                        furi_record_close(RECORD_DIALOGS);
+                        i2ctools_show_dialog_message("Storage unavailable");
                     }
                     clear_sniffer_buffers(i2ctools->sniffer);
                     start_interrupts(i2ctools->sniffer);
@@ -221,13 +230,11 @@ int32_t i2ctools_app(void* p) {
         }
         view_port_update(i2ctools->view_port);
         if(i2ctools->sniffer->log_error_pending) {
-            DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
             const char* toast_message =
                 i2ctools->sniffer->log_error_message[0] != '\0'
                     ? i2ctools->sniffer->log_error_message
                     : "Log write failed";
-            dialogs_app_toast_show(dialogs, toast_message, 2000);
-            furi_record_close(RECORD_DIALOGS);
+            i2ctools_show_dialog_message(toast_message);
             i2ctools->sniffer->log_error_pending = false;
             i2ctools->sniffer->log_error_message[0] = '\0';
         }
